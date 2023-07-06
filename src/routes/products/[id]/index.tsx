@@ -1,10 +1,11 @@
 import { component$ } from "@builder.io/qwik";
 import { type DocumentHead, Link, routeLoader$ } from "@builder.io/qwik-city";
 
-export const useProduct = routeLoader$(async () => {
+export const useProduct = routeLoader$(async (requestEvent) => {
     let data = null;
     try {
-        const resp = await fetch('https://limberit.cloud/quicideportes/api_sgi/public/api/baseproduct/29/products');
+        const productId = requestEvent.params.id;
+        const resp = await fetch(`https://limberit.cloud/quicideportes/api_sgi/public/api/baseproduct/${productId}/products`);
         const responseData = await resp.json();
         data = responseData.data[0];
     } catch (error) {
@@ -44,11 +45,15 @@ export default component$(() => {
     );
 });
 
-export const head: DocumentHead = ({ resolveValue }) => {
+export const head: DocumentHead = ({ resolveValue, params }) => {
     const metadata = resolveValue(useProduct);
     return {
         title: metadata.base_product,
         meta: [
+            {
+                name: 'id',
+                content: params.id,
+            },
             {
                 name: 'description',
                 content: metadata.gender_line,
